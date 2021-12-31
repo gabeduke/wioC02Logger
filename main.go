@@ -70,7 +70,6 @@ func main() {
 		tempToken := client.Publish(fmt.Sprintf("telegraf/%s/temperature", name), 0, false, fmt.Sprintf("%f", reading.Temperature))
 		if !tempToken.WaitTimeout(timeoutShort) {
 			log.Println(errors.New("unable to publish temperature reading"))
-
 		}
 
 		concToken := client.Publish(fmt.Sprintf("telegraf/%s/concentration", name), 0, false, fmt.Sprintf("%f", reading.Concentration))

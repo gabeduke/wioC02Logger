@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wioc02
+  labels:
+    app: wioc02
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wioc02
+  template:
+    metadata:
+      labels:
+        app: wioc02
+    spec:
+      containers:
+        - name: wioc02
+          image: dukeman/wioc02
+          command: ["/bin/app"]
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: wioc02
+#          env:
+#            - name: WIO_TOKEN
+#              value: "84534095d1bd70272e2cc884ac3f35ea"

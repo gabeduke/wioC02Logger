@@ -16,7 +16,7 @@ import (
 const timeoutShort = time.Second * 30
 const timeoutLong = time.Second * 300
 
-var name = getenv("POD_NAME", "wio")
+var clientID = getenv("POD_NAME", "wio")
 
 type C02 struct {
 	Concentration float64 `json:"concentration,omitempty"`
@@ -43,7 +43,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 func createMQTTClient(brokerURL string, channel chan<- mqtt.Message) mqtt.Client {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(brokerURL)
-	opts.SetClientID(name)
+	opts.SetClientID(clientID)
 
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
 		channel <- msg
@@ -58,10 +58,15 @@ func createMQTTClient(brokerURL string, channel chan<- mqtt.Message) mqtt.Client
 }
 
 func main() {
+	mqtt.ERROR = log.New(os.Stdout, "[ERROR] ", 0)
+	mqtt.CRITICAL = log.New(os.Stdout, "[CRIT] ", 0)
+	mqtt.WARN = log.New(os.Stdout, "[WARN]  ", 0)
+	mqtt.DEBUG = log.New(os.Stdout, "[DEBUG] ", 0)
 
 	var broker = "tcp://mqtt.leetserve.com:1883"
 	var readingUrl = fmt.Sprintf("https://us.wio.seeed.io/v1/node/GroveCo2MhZ16UART0/concentration_and_temperature?access_token=%v", os.Getenv("WIO_TOKEN"))
-	var name = "wioC02"
+	var database = "telegraf"
+	var topicName = "wioC02"
 
 	receiveChannel := make(chan mqtt.Message)
 
@@ -77,12 +82,12 @@ func main() {
 			continue
 		}
 
-		tempToken := client.Publish(fmt.Sprintf("telegraf/%s/temperature", name), 0, false, fmt.Sprintf("%f", reading.Temperature))
+		tempToken := client.Publish(fmt.Sprintf("%s/%s/temperature", database, topicName), 0, false, fmt.Sprintf("%f", reading.Temperature))
 		if !tempToken.WaitTimeout(timeoutShort) {
 			log.Println(errors.New("unable to publish temperature reading"))
 		}
 
-		concToken := client.Publish(fmt.Sprintf("telegraf/%s/concentration", name), 0, false, fmt.Sprintf("%f", reading.Concentration))
+		concToken := client.Publish(fmt.Sprintf("%s/%s/concentration", database, topicName), 0, false, fmt.Sprintf("%f", reading.Concentration))
 		if !concToken.WaitTimeout(timeoutShort) {
 			log.Println(errors.New("unable to publish concentration reading"))
 		}

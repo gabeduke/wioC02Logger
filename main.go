@@ -16,7 +16,7 @@ import (
 const timeoutShort = time.Second * 30
 const timeoutLong = time.Second * 300
 
-var clientID = getenv("POD_NAME", "wio")
+var clientID = "wioc02"
 
 type C02 struct {
 	Concentration float64 `json:"concentration,omitempty"`

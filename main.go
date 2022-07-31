@@ -43,7 +43,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 func createMQTTClient(brokerURL string, channel chan<- mqtt.Message) mqtt.Client {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(brokerURL)
-	opts.SetClientID("wio")
+	opts.SetClientID(name)
 
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
 		channel <- msg

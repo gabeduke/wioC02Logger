@@ -16,10 +16,20 @@ import (
 const timeoutShort = time.Second * 30
 const timeoutLong = time.Second * 300
 
+var name = getenv("POD_NAME", "wio")
+
 type C02 struct {
 	Concentration float64 `json:"concentration,omitempty"`
 	Temperature   float64 `json:"temperature,omitempty"`
 	Error         string  `json:"error,omitempty"`
+}
+
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
 }
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {

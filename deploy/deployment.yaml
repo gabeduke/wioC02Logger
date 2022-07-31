@@ -22,6 +22,8 @@ spec:
           envFrom:
             - secretRef:
                 name: wioc02
-#          env:
-#            - name: WIO_TOKEN
-#              value: "84534095d1bd70272e2cc884ac3f35ea"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
